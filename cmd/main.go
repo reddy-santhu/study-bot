@@ -3,9 +3,13 @@ package main
 import (
 	"fmt"
 
+	"github.com/reddy-santhu/study-bot/bot"
 	"github.com/reddy-santhu/study-bot/config"
+	"github.com/reddy-santhu/study-bot/db"
 	"github.com/reddy-santhu/study-bot/utils"
 )
+
+
 
 func main() {
 	utils.InitializeLogger()
@@ -16,10 +20,15 @@ func main() {
 		utils.ErrorLogger.Fatalf("Error loading configuration: %v", err)
 	}
 
+	// Connect to MongoDB
+	db.ConnectDB()
+
 	fmt.Printf("Bot Prefix: %s\n", cfg.Bot.Prefix)
 	fmt.Printf("MongoDB URI: %s\n", cfg.MongoDB.URI)
 	fmt.Printf("Gemini API Key: %s\n", cfg.Gemini.APIKey)
 
-	fmt.Println("Bot running")
-	// Bot logic will go here later
+	// Start the Discord bot
+	bot.StartBot(cfg)
+
+	fmt.Println("Bot running") // This line will not be reached unless the bot fails to start
 }

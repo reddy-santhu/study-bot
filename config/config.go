@@ -16,7 +16,7 @@ type Config struct {
 	} `yaml:"bot"`
 	MongoDB struct {
 		URI    string `yaml:"uri"`
-		DBname string `yaml:"dbnane"`
+		Dbname string `yaml:"dbname"`
 	} `yaml:"mongodb"`
 	Gemini struct {
 		APIKey string `yaml:"api_key"`
