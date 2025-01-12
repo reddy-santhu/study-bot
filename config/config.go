@@ -13,13 +13,13 @@ type Config struct {
 	Bot struct {
 		Token  string `yaml:"token"`
 		Prefix string `yaml:"prefix"`
-	} `yaml:bot`
+	} `yaml:"bot"`
 	MongoDB struct {
 		URI    string `yaml:"uri"`
 		DBname string `yaml:"dbnane"`
 	} `yaml:"mongodb"`
 	Gemini struct {
-		APIKey string `yaml:"api_key`
+		APIKey string `yaml:"api_key"`
 	}
 }
 
