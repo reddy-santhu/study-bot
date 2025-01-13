@@ -50,6 +50,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		switch {
 		case strings.HasPrefix(m.Content, "/study set"):
 			commands.HandleStudySet(s, m)
+		case strings.HasPrefix(m.Content, "/study list"):
+			commands.HandleStudyList(s, m)
+		case strings.HasPrefix(m.Content, "/study remove"):
+			commands.HandleStudyRemove(s, m)
 		}
 		return
 	}

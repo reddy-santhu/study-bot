@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -83,4 +84,88 @@ func GetUser(userID string) (*db.User, error) {
 	}
 
 	return user, nil
+}
+
+// list
+
+func HandleStudyList(s *discordgo.Session, m *discordgo.MessageCreate) {
+	userID := m.Author.ID
+
+	user, err := GetUser(userID)
+	if err != nil {
+		log.Printf("Error getting study goals for user %s: %v", userID, err)
+		s.ChannelMessageSend(m.ChannelID, "Failed to retrieve study goals. Please try again.")
+		return
+	}
+
+	if user == nil || len(user.StudyGoals) == 0 {
+		s.ChannelMessageSend(m.ChannelID, "You have no study goals set.")
+		return
+	}
+
+	var goalsList string
+	for i, goal := range user.StudyGoals {
+		goalsList += fmt.Sprintf("%d. %s\n", i+1, goal)
+	}
+
+	s.ChannelMessageSend(m.ChannelID, "Your study goals:\n"+goalsList)
+}
+
+// remove
+func HandleStudyRemove(s *discordgo.Session, m *discordgo.MessageCreate) {
+	parts := strings.SplitN(m.Content, " ", 3)
+	if len(parts) < 3 {
+		s.ChannelMessageSend(m.ChannelID, "Invalid command. Usage: /study remove <goal number>")
+		return
+	}
+
+	userID := m.Author.ID
+
+	goalNumberStr := parts[2]
+	goalNumber, err := strconv.Atoi(goalNumberStr)
+	if err != nil {
+		s.ChannelMessageSend(m.ChannelID, "Invalid goal number. Please enter a valid number.")
+		return
+	}
+
+	err = RemoveStudyGoal(userID, goalNumber)
+	if err != nil {
+		log.Printf("Error removing study goal for user %s: %v", userID, err)
+		s.ChannelMessageSend(m.ChannelID, "Failed to remove study goal. Please try again.")
+		return
+	}
+
+	s.ChannelMessageSend(m.ChannelID, "Study goal removed successfully.")
+}
+
+func RemoveStudyGoal(userID string, goalNumber int) error {
+	usersCollection := db.GetCollection("users")
+
+	user, err := GetUser(userID)
+	if err != nil {
+		return fmt.Errorf("error getting user: %w", err)
+	}
+
+	if user == nil || len(user.StudyGoals) == 0 {
+		return fmt.Errorf("no study goals to remove")
+	}
+
+	if goalNumber < 1 || goalNumber > len(user.StudyGoals) {
+		return fmt.Errorf("invalid goal number")
+	}
+
+	goalIndex := goalNumber - 1
+	goalToRemove := user.StudyGoals[goalIndex]
+
+	user.StudyGoals = append(user.StudyGoals[:goalIndex], user.StudyGoals[goalIndex+1:]...)
+
+	update := bson.M{"$set": bson.M{"study_goals": user.StudyGoals}}
+	_, err = usersCollection.UpdateOne(ctx, bson.M{"_id": userID}, update)
+	if err != nil {
+		return fmt.Errorf("error updating user: %w", err)
+	}
+
+	log.Printf("Removed goal '%s' for user %s", goalToRemove, userID)
+
+	return nil
 }
