@@ -2,16 +2,23 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
-
 	"time"
 
+	"errors"
+
 	"github.com/reddy-santhu/study-bot/config"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var DB *mongo.Database
+var (
+	DB            *mongo.Database
+	ctx           context.Context
+	clientOptions *options.ClientOptions
+)
 
 func ConnectDB() {
 	cfg, err := config.LoadConfig("config/config.yaml")
@@ -19,16 +26,10 @@ func ConnectDB() {
 		log.Fatalf("Error loading configuration: %v", err)
 		return
 	}
+	clientOptions = options.Client()
 
-	// Create client options
-	log.Printf("MongoDB URI from config: %s", cfg.MongoDB.URI)       // Add this line
-	log.Printf("MongoDB Dbname from config: %s", cfg.MongoDB.Dbname) // Add this line
-	clientOptions := options.Client()
-
-	// Apply URI first to establish basic connection parameters
 	clientOptions = clientOptions.ApplyURI(cfg.MongoDB.URI)
 
-	// The connect method does not accept options
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -37,7 +38,6 @@ func ConnectDB() {
 		log.Fatal(err)
 	}
 
-	// Check the connection
 	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -50,4 +50,21 @@ func ConnectDB() {
 
 func GetCollection(collectionName string) *mongo.Collection {
 	return DB.Collection(collectionName)
+}
+
+func GetUser(userID string) (*User, error) {
+	collection := DB.Collection("users")
+	var user User
+
+	filter := bson.M{"_id": userID}
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to find user: %w", err)
+	}
+
+	return &user, nil
 }

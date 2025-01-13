@@ -5,31 +5,32 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
+
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/reddy-santhu/study-bot/bot/commands"
 	"github.com/reddy-santhu/study-bot/config"
 )
 
 var Discord *discordgo.Session
 
 func StartBot(cfg *config.Config) {
-
 	dg, err := discordgo.New("Bot " + cfg.Bot.Token)
 	if err != nil {
-		log.Fatalf("Error creating Bot Session %v", err)
+		log.Fatalf("Error creating Discord session: %v", err)
 	}
 
 	Discord = dg
 
 	dg.AddHandler(messageCreate)
 
-	// dg.Identify.Intents = discordgo.IntentsGuildMessages
-
 	dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsDirectMessages
+
 	err = dg.Open()
 	if err != nil {
-		log.Fatalf("Error opening a websocket session %v", err)
+		log.Fatalf("Error opening connection: %v", err)
 	}
 
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
@@ -38,17 +39,22 @@ func StartBot(cfg *config.Config) {
 	<-sc
 
 	dg.Close()
-
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
 
-	if m.Content == "Hi" {
-		s.ChannelMessageSend(m.ChannelID, "Hello ")
+	if strings.HasPrefix(m.Content, "/study") {
+		switch {
+		case strings.HasPrefix(m.Content, "/study set"):
+			commands.HandleStudySet(s, m)
+		}
+		return
 	}
 
+	if m.Content == "ping!" {
+		s.ChannelMessageSend(m.ChannelID, "Pong!")
+	}
 }

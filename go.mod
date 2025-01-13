@@ -3,12 +3,12 @@ module github.com/reddy-santhu/study-bot
 go 1.23.6
 
 require (
+	github.com/bwmarrin/discordgo v0.28.1
 	go.mongodb.org/mongo-driver v1.17.3
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
-	github.com/bwmarrin/discordgo v0.28.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect

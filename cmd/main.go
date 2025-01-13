@@ -9,8 +9,6 @@ import (
 	"github.com/reddy-santhu/study-bot/utils"
 )
 
-
-
 func main() {
 	utils.InitializeLogger()
 	utils.InfoLogger.Println("Starting the Study Bot...")
@@ -30,5 +28,5 @@ func main() {
 	// Start the Discord bot
 	bot.StartBot(cfg)
 
-	fmt.Println("Bot running") // This line will not be reached unless the bot fails to start
+	fmt.Println("Bot running")
 }
