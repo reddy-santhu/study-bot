@@ -58,6 +58,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	// Pomo command
+	if strings.HasPrefix(m.Content, "/pomo") {
+		commands.HandlePomo(s, m)
+		return
+	}
+
 	if m.Content == "ping!" {
 		s.ChannelMessageSend(m.ChannelID, "Pong!")
 	}
