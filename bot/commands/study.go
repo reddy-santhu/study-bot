@@ -59,6 +59,12 @@ func SetStudyGoal(userID string, goal string, username string) error {
 		if err != nil {
 			return fmt.Errorf("error inserting new user: %w", err)
 		}
+
+		err = db.LogStudyActivity(userID, "set_goal")
+		if err != nil {
+			log.Printf("Error logging study activity: %v", err)
+		}
+
 		return nil
 	}
 
@@ -66,6 +72,11 @@ func SetStudyGoal(userID string, goal string, username string) error {
 	_, err = usersCollection.UpdateOne(ctx, bson.M{"_id": userID}, update)
 	if err != nil {
 		return fmt.Errorf("error updating user: %w", err)
+	}
+
+	err = db.LogStudyActivity(userID, "set_goal")
+	if err != nil {
+		log.Printf("Error logging study activity: %v", err)
 	}
 
 	return nil

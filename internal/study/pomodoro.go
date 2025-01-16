@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/reddy-santhu/study-bot/db"
 )
 
 type PomodoroSession struct {
@@ -52,6 +53,10 @@ func StartPomodoro(s *discordgo.Session, m *discordgo.MessageCreate, workTime in
 	session.Timer = time.NewTimer(time.Duration(workTime) * time.Minute)
 	activePomodoros[userID] = session
 
+	err := db.LogStudyActivity(userID, "start_pomodoro")
+	if err != nil {
+		log.Printf("Error logging study activity: %v", err)
+	}
 	s.ChannelMessageSend(channelID, fmt.Sprintf("Pomodoro timer started! Work for %d minutes, then break for %d minutes. Task: %s", workTime, breakTime, task))
 
 	go runPomodoro(s, session)

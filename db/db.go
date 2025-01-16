@@ -68,3 +68,21 @@ func GetUser(userID string) (*User, error) {
 
 	return &user, nil
 }
+
+func LogStudyActivity(userID string, activity string) error {
+	collection := DB.Collection("study_logs")
+
+	studyLog := StudyLog{
+		UserID:    userID,
+		Timestamp: time.Now(),
+		Activity:  activity,
+		CreatedAt: time.Now(),
+	}
+
+	_, err := collection.InsertOne(context.TODO(), studyLog)
+	if err != nil {
+		return fmt.Errorf("failed to log study activity: %w", err)
+	}
+
+	return nil
+}

@@ -24,3 +24,11 @@ type Reminder struct {
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }
+
+type StudyLog struct {
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	UserID    string             `bson:"user_id" json:"user_id"`
+	Timestamp time.Time          `bson:"timestamp" json:"timestamp"`
+	Activity  string             `bson:"activity" json:"activity"`
+	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
+}
