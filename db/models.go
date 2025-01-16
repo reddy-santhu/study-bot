@@ -7,13 +7,14 @@ import (
 )
 
 type User struct {
-	ID         string    `bson:"_id" json:"id"` // Discord User ID
-	Username   string    `bson:"username" json:"username"`
-	StudyGoals []string  `bson:"study_goals" json:"study_goals"`
-	Streak     int       `bson:"streak" json:"streak"`
-	LastStudy  time.Time `bson:"last_study" json:"last_study"`
-	CreatedAt  time.Time `bson:"created_at" json:"created_at"`
-	UpdatedAt  time.Time `bson:"updated_at" json:"updated_at"`
+	ID               string    `bson:"_id" json:"id"` // Discord User ID
+	Username         string    `bson:"username" json:"username"`
+	StudyGoals       []string  `bson:"study_goals" json:"study_goals"`
+	Streak           int       `bson:"streak" json:"streak"`
+	LastStudy        time.Time `bson:"last_study" json:"last_study"`
+	CreatedAt        time.Time `bson:"created_at" json:"created_at"`
+	UpdatedAt        time.Time `bson:"updated_at" json:"updated_at"`
+	TotalDaysStudied int       `bson:"total_days_studied" json:"total_days_studied"`
 }
 
 type Reminder struct {

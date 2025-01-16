@@ -70,6 +70,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	// streak command
+	if strings.HasPrefix(m.Content, "/streak") {
+		commands.HandleStreak(s, m)
+		return
+	}
+
 	if m.Content == "ping!" {
 		s.ChannelMessageSend(m.ChannelID, "Pong!")
 	}

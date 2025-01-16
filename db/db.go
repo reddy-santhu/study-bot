@@ -83,6 +83,20 @@ func LogStudyActivity(userID string, activity string) error {
 	if err != nil {
 		return fmt.Errorf("failed to log study activity: %w", err)
 	}
+	usersCollection := DB.Collection("users")
+
+	today := GetTodayDate()
+
+	update := bson.M{"$set": bson.M{"last_study": today}, "$inc": bson.M{"total_days_studied": 1}}
+	_, err = usersCollection.UpdateOne(context.TODO(), bson.M{"_id": userID, "last_study": bson.M{"$ne": today}}, update)
+	if err != nil {
+		return fmt.Errorf("error updating user last_study and total_days_studied: %w", err)
+	}
 
 	return nil
+}
+
+func GetTodayDate() time.Time {
+	now := time.Now()
+	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 }
