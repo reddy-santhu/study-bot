@@ -76,6 +76,18 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	// Ask command
+	if strings.HasPrefix(m.Content, "/ask") {
+		commands.HandleAsk(s, m)
+		return
+	}
+
+	// Summarize command
+	if strings.HasPrefix(m.Content, "/summarize") {
+		commands.HandleSummarize(s, m)
+		return
+	}
+
 	if m.Content == "ping!" {
 		s.ChannelMessageSend(m.ChannelID, "Pong!")
 	}
