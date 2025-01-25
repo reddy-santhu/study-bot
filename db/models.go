@@ -33,3 +33,11 @@ type StudyLog struct {
 	Activity  string             `bson:"activity" json:"activity"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 }
+
+type PDFData struct {
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	UserID    string             `bson:"user_id" json:"user_id"`
+	Filename  string             `bson:"filename" json:"filename"`
+	Text      string             `bson:"text" json:"text"`
+	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
+}

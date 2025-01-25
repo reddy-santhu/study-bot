@@ -100,3 +100,21 @@ func GetTodayDate() time.Time {
 	now := time.Now()
 	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 }
+
+func LogPDFData(userID string, filename string, text string) error {
+	collection := DB.Collection("pdf_data")
+
+	pdfData := PDFData{
+		UserID:    userID,
+		Filename:  filename,
+		Text:      text,
+		CreatedAt: time.Now(),
+	}
+
+	_, err := collection.InsertOne(context.TODO(), pdfData)
+	if err != nil {
+		return fmt.Errorf("failed to log PDF data: %w", err)
+	}
+
+	return nil
+}

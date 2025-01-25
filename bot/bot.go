@@ -88,6 +88,13 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	// Remind command
+	if strings.HasPrefix(m.Content, "/pdf") {
+		log.Printf("The command is active. Now running upload %s", m.Content)
+		commands.HandleUploadPDF(s, m)
+		return
+	}
+
 	if m.Content == "ping!" {
 		s.ChannelMessageSend(m.ChannelID, "Pong!")
 	}
