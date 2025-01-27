@@ -92,3 +92,25 @@ func extractTextFromPDF(pdfPath string) (string, error) {
 	}
 	return textBuilder.String(), nil
 }
+func HandleViewPDF(s *discordgo.Session, m *discordgo.MessageCreate) {
+	userID := m.Author.ID
+	pdfs, err := db.GetPDFsByUser(userID)
+	if err != nil {
+		log.Printf("Error getting PDFs for user %s: %v", userID, err)
+		s.ChannelMessageSend(m.ChannelID, "Error occurred while retrieving your PDFs. Please try again.")
+		return
+	}
+
+	if len(pdfs) == 0 {
+		s.ChannelMessageSend(m.ChannelID, "You have not uploaded any PDFs yet. Use /pdf to upload.")
+		return
+	}
+
+	var message strings.Builder
+	message.WriteString("Your Uploaded PDFs:\n")
+	for i, pdfData := range pdfs {
+		message.WriteString(fmt.Sprintf("%d. %s\n", i+1, pdfData.Filename)) // Format as a numbered list
+	}
+
+	s.ChannelMessageSend(m.ChannelID, message.String())
+}

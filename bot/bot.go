@@ -95,6 +95,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	// View PDF data
+	if strings.HasPrefix(m.Content, "/viewpdf") {
+		commands.HandleViewPDF(s, m)
+		return
+	}
 	if m.Content == "ping!" {
 		s.ChannelMessageSend(m.ChannelID, "Pong!")
 	}

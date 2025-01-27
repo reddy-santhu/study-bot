@@ -118,3 +118,27 @@ func LogPDFData(userID string, filename string, text string) error {
 
 	return nil
 }
+
+func GetPDFsByUser(userID string) ([]PDFData, error) {
+	collection := DB.Collection("pdf_data")
+
+	filter := bson.M{"user_id": userID}
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		return nil, fmt.Errorf("error finding PDFs: %w", err)
+	}
+	defer cursor.Close(context.TODO())
+	var pdfs []PDFData
+	for cursor.Next(context.TODO()) {
+		var pdf PDFData
+		err := cursor.Decode(&pdf)
+		if err != nil {
+			return nil, fmt.Errorf("error decoding PDF: %w", err)
+		}
+		pdfs = append(pdfs, pdf)
+	}
+	if err := cursor.Err(); err != nil {
+		return nil, fmt.Errorf("cursor error: %w", err)
+	}
+	return pdfs, nil
+}
