@@ -142,3 +142,17 @@ func GetPDFsByUser(userID string) ([]PDFData, error) {
 	}
 	return pdfs, nil
 }
+
+func GetPDFbyNumberandUser(pdfNumber int, userID string) (*PDFData, error) {
+	// collection := DB.Collection("pdf_data")
+	pdfs, err := GetPDFsByUser(userID)
+	if err != nil {
+		return nil, err
+	}
+	if pdfNumber < 1 || pdfNumber > len(pdfs) {
+		return nil, fmt.Errorf("invalid pdf number")
+	}
+	pdfData := pdfs[pdfNumber-1]
+
+	return &pdfData, nil
+}

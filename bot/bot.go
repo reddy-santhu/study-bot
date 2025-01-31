@@ -76,6 +76,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	if strings.HasPrefix(m.Content, "/askAi") {
+		commands.HandleAskPDF(s, m)
+		return
+	}
+
 	// Ask command
 	if strings.HasPrefix(m.Content, "/ask") {
 		commands.HandleAsk(s, m)
@@ -100,6 +105,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		commands.HandleViewPDF(s, m)
 		return
 	}
+
 	if m.Content == "ping!" {
 		s.ChannelMessageSend(m.ChannelID, "Pong!")
 	}

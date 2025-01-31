@@ -6,12 +6,85 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/ledongthuc/pdf"
+	"github.com/reddy-santhu/study-bot/ai"
+	"github.com/reddy-santhu/study-bot/config"
 	"github.com/reddy-santhu/study-bot/db"
 )
+
+type PDFAskSession struct {
+	UserID    string
+	PdfNumber int
+	PdfName   string
+	History   string
+}
+
+var activePDFASk = make(map[string]PDFAskSession)
+var mu sync.Mutex
+
+func HandleAskPDF(s *discordgo.Session, m *discordgo.MessageCreate) {
+	mu.Lock()
+	defer mu.Unlock()
+
+	parts := strings.SplitN(m.Content, " ", 3)
+	if len(parts) < 3 {
+		s.ChannelMessageSend(m.ChannelID, "Invalid command. Usage: /askAi <pdf_number> <question>")
+		return
+	}
+	cfg, err := config.LoadConfig("config/config.yaml")
+	if err != nil {
+		fmt.Println("Error loading configuration:", err)
+		s.ChannelMessageSend(m.ChannelID, "Error loading configuration please report 1")
+		return
+	}
+	pdfNumberStr := parts[1]
+	question := parts[2]
+
+	pdfNumber, err := strconv.Atoi(pdfNumberStr)
+	if err != nil {
+		s.ChannelMessageSend(m.ChannelID, "Invalid PDF number. Please enter a valid number.")
+		return
+	}
+	userID := m.Author.ID
+	pdfData, err := db.GetPDFbyNumberandUser(pdfNumber, userID)
+	if err != nil {
+		s.ChannelMessageSend(m.ChannelID, "PDF doesn't exist, check 1")
+		return
+	}
+	fmt.Println("Data is:", pdfData)
+	if pdfData == nil {
+		s.ChannelMessageSend(m.ChannelID, "Could not access PDF! PDF data has been corrupted. Try again later or report")
+		return
+	}
+	apiKey := cfg.Gemini.APIKey
+
+	session, ok := activePDFASk[userID]
+	prompt := ""
+	if ok {
+		prompt = session.History + fmt.Sprintf("Question: %s\n", question)
+	} else {
+		prompt = fmt.Sprintf("Answer the following question based on the content of the following: %s\nQuestion: %s\n", pdfData.Text, question)
+	}
+	response, err := ai.AskGemini(apiKey, prompt)
+	if err != nil {
+		log.Printf("Error asking Gemini: %v", err)
+		s.ChannelMessageSend(m.ChannelID, "Sorry, I couldn't answer that question right now. Please try again later.")
+		return
+	}
+	activePDFASk[userID] = PDFAskSession{
+		UserID:    userID,
+		PdfNumber: pdfNumber,
+		PdfName:   pdfData.Filename,
+		History:   prompt + fmt.Sprintf("Answer: %s\n", response),
+	}
+
+	s.ChannelMessageSend(m.ChannelID, response)
+}
 
 func HandleUploadPDF(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if len(m.Attachments) > 0 {
@@ -109,7 +182,7 @@ func HandleViewPDF(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var message strings.Builder
 	message.WriteString("Your Uploaded PDFs:\n")
 	for i, pdfData := range pdfs {
-		message.WriteString(fmt.Sprintf("%d. %s\n", i+1, pdfData.Filename)) // Format as a numbered list
+		message.WriteString(fmt.Sprintf("%d. %s\n", i+1, pdfData.Filename))
 	}
 
 	s.ChannelMessageSend(m.ChannelID, message.String())
