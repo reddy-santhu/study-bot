@@ -6,6 +6,8 @@ require (
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/go-co-op/gocron v1.37.0
 	github.com/google/generative-ai-go v0.19.0
+	github.com/joho/godotenv v1.5.1
+	github.com/ledongthuc/pdf v0.0.0-20240201131950-da5b75280b06
 	go.mongodb.org/mongo-driver v1.17.3
 	google.golang.org/api v0.226.0
 	gopkg.in/yaml.v2 v2.4.0
@@ -28,7 +30,6 @@ require (
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
-	github.com/ledongthuc/pdf v0.0.0-20240201131950-da5b75280b06 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect

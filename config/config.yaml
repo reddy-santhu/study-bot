@@ -1,10 +1,10 @@
 bot:
-  token: "MTM0OTc1NjgxNTU5MTczNTMxNw.GSOQIX.9pFAQ0C2jdi1Qw5SBLwaOtBgmguMX-rTH0iL7Q"
+  token: ""
   prefix: "/"
 
 mongodb:
-  uri: "mongodb+srv://santhu:Reddy.santhu06@cluster0.zvke2.mongodb.net/"
+  uri: ""
   dbname: "studybot"
 
 gemini:
-  api_key: "AIzaSyC2YuoOliRaukhJZqQCKwBOJd2D4IjJ1XA"
+  api_key: ""
