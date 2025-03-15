@@ -74,7 +74,7 @@ The Personalized Study Assistant Bot is built using Golang and leverages the Dis
     ```
 3. **Project Structure:**
 
-
+```
 study-bot/
 │── ai/                        # AI-related code (Gemini integration)
 │   └── gemini.go              # Interacts with the Gemini API
@@ -106,7 +106,7 @@ study-bot/
 │── go.sum                     # Go module checksums
 │── README.md                  # Project documentation
 └── .gitignore                 # Files/folders to ignore in Git
-
+```
 
 ## Configuration
 
